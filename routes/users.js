@@ -1,11 +1,23 @@
 const express = require('express');
 const router = express.Router();
+const conn = require('../mariadb.js');
 
 router.use(express.json());
 
 // 회원 가입
 router.post('/join', (req, res) => {
-  res.json({ message: 'join' });
+  const { email, password } = req.body;
+  let sql = 'INSERT INTO users (email, password) VALUES (?, ?)';
+  let values = [email, password];
+
+  conn.query(sql, values, (err, results) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).end(); // BAD REQUEST
+    }
+    res.status(201).json(results);
+  });
+  res.json({ message: '회원가입' });
 });
 
 // 로그인
