@@ -5,7 +5,9 @@ const { StatusCodes } = require('http-status-codes');
 const allBooks = (req, res) => {
   const { category_id, news, limit, currentPage } = req.query;
   const offset = parseInt(limit) * (parseInt(currentPage) - 1);
-  let sql = 'SELECT * FROM books';
+  let sql = `SELECT *,
+  (SELECT count(*) FROM likes WHERE liked_book_id = books.id)
+  AS likes FROM books`;
   let values = [parseInt(limit), offset];
 
   if (category_id && news) {
@@ -31,13 +33,19 @@ const allBooks = (req, res) => {
 
 // 개별 도서 조회
 const bookDetail = (req, res) => {
-  const { id } = req.params;
+  const { user_id } = req.body;
+  const { id } = req.params; // bookId
   const bookId = parseInt(id);
 
   // const sql = 'SELECT * FROM books WHERE id = ?';
-  const sql = `SELECT * FROM books LEFT JOIN
-  category ON books.category_id = category.id WHERE books.id = ?`;
-  conn.query(sql, bookId, (err, results) => {
+  const sql = `SELECT *,
+  (SELECT count(*) FROM likes WHERE liked_book_id = books.id) AS likes,
+  (SELECT EXISTS (SELECT * FROM likes WHERE user_id = ? AND liked_book_id = ?)) AS liked
+  FROM books
+  LEFT JOIN category 
+  ON books.category_id = category.category_id WHERE books.id = ?`;
+  const values = [user_id, bookId, bookId];
+  conn.query(sql, values, (err, results) => {
     if (err) {
       console.log(err);
       res.status(StatusCodes.BAD_REQUEST).end();
