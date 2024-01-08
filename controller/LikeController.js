@@ -17,6 +17,7 @@ const addLike = (req, res) => {
     res.status(StatusCodes.OK).json(results);
   });
 };
+
 const rmLike = (req, res) => {
   const { id } = req.params;
   const { user_id } = req.body; // token 사용 전 테스트용 코드
