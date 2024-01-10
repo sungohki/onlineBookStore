@@ -1,8 +1,9 @@
 // import mysql module
-const mariadb = require('mysql2');
+// const mariadb = require('mysql2');
+const mariadb = require('mysql2/promise'); // Add promise func
 
 // Open connection to DB
-const connection = mariadb.createConnection({
+const connection = await mariadb.createConnection({
   // host: 'locathost',
   host: '127.0.0.1',
   user: 'root',
