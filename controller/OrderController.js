@@ -1,42 +1,37 @@
-const conn = require('../mariadb');
+// const conn = require('../mariadb'); // promise wrapping을 위한 모듈화 포기
+const mariadb = require('mysql2/promise');
 const { StatusCodes } = require('http-status-codes');
 
-const order = (req, res) => {
+const order = async (req, res) => {
+  const conn = await mariadb.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    database: 'BookShop',
+    password: 'root',
+    dateStrings: true,
+  });
+
   const { items, delivery, totalQuantity, totalPrice, userId, firstBookTitle } =
     req.body;
-  let sql = `
-  INSERT INTO delivery (address, receiver, contact) VALUES (?, ?, ?);
-  `;
+
+  // delivery 테이블 데이터 삽입
+  let sql = `INSERT INTO delivery (address, receiver, contact) VALUES (?, ?, ?);`;
   let values = [delivery.address, delivery.receiver, delivery.contact];
-  let delivery_id = 3;
-  let order_id = 2;
-  //   let delivery_id;
-  //   let order_id;
+  let [results] = await conn.execute(sql, values);
 
-  //   conn.query(sql, values, (err, results) => {
-  //     if (err) {
-  //       console.log(err);
-  //       return res.status(StatusCodes.BAD_REQUEST).end();
-  //     }
-  //     delivery_id = results.insertId;
+  const delivery_id = results.insertId;
 
-  //     return res.status(StatusCodes.OK).json(results);
-  //   });
+  // orders 테이블 데이터 삽입
   sql = `
     INSERT INTO orders (book_title, total_quantity, total_price, user_id, delivery_id)
     VALUES (?, ?, ?, ?, ?);
   `;
   values = [firstBookTitle, totalQuantity, totalPrice, userId, delivery_id];
-  //   conn.query(sql, values, (err, results) => {
-  //     if (err) {
-  //       console.log(err);
-  //       return res.status(StatusCodes.BAD_REQUEST).end();
-  //     }
-  //     order_id = results.insertId;
-  //     console.log(order_id);
+  [results] = await conn.execute(sql, values);
 
-  //     return res.status(StatusCodes.OK).json(results);
-  //   });
+  const order_id = results.insertId;
+
+  // orderedBook 테이블 데이터 삽입
   sql = `
     INSERT INTO orderedBook (order_id, book_id, quantity) VALUES ?;
   `;
@@ -44,15 +39,11 @@ const order = (req, res) => {
   items.forEach((item) => {
     values.push([order_id, item.book_id, item.quantity]);
   });
-  conn.query(sql, [values], (err, results) => {
-    if (err) {
-      console.log(err);
-      return res.status(StatusCodes.BAD_REQUEST).end();
-    }
+  [results] = await conn.query(sql, [values]);
 
-    return res.status(StatusCodes.OK).json(results);
-  });
+  return res.status(StatusCodes.OK).json(results);
 };
+
 const getOrders = (req, res) => {
   const sql = ``;
   const values = [];
