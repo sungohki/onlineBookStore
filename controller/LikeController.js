@@ -1,13 +1,23 @@
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 const conn = require('../mariadb');
 const { StatusCodes } = require('http-status-codes');
+dotenv.config();
+
+// jwt 토큰 권한 체크
+const ensureAuthorization = (req) => {
+  const receivedJwt = req.headers['authorization'];
+  const decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
+  return decodedJwt;
+};
 
 // 좋아요 추가
 const addLike = (req, res) => {
-  const { id } = req.params;
-  const { user_id } = req.body; // token 사용 전 테스트용 코드
+  const book_id = req.params.id;
+  const authorization = ensureAuthorization(req);
 
-  let sql = `INSERT INTO likes (user_id, liked_book_id) VALUES (?, ?);`;
-  let values = [parseInt(user_id), parseInt(id)];
+  const sql = `INSERT INTO likes (user_id, liked_book_id) VALUES (?, ?);`;
+  const values = [authorization.id, parseInt(book_id)];
 
   conn.query(sql, values, (err, results) => {
     if (err) {
@@ -19,13 +29,11 @@ const addLike = (req, res) => {
 };
 
 const rmLike = (req, res) => {
-  const { id } = req.params;
-  const { user_id } = req.body; // token 사용 전 테스트용 코드
+  const book_id = req.params.id;
+  const authorization = ensureAuthorization(req);
 
-  //   let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
-  let sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
-  let values = [user_id, id];
-  console.log(values);
+  const sql = `DELETE FROM likes WHERE user_id = ? AND liked_book_id = ?;`;
+  const values = [authorization.id, book_id];
   conn.query(sql, values, (err, results) => {
     if (err) {
       console.log(err);
