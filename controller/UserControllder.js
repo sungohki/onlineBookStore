@@ -47,7 +47,8 @@ const login = (req, res) => {
         },
         process.env.PRIVATE_KEY,
         {
-          expiresIn: '5m',
+          expiresIn: '1m',
+          // expiresIn: '5m',
           issuer: 'sungohki',
         }
       );
