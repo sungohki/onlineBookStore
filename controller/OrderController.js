@@ -10,7 +10,6 @@ const order = async (req, res) => {
     password: 'root',
     dateStrings: true,
   });
-
   const { items, delivery, totalQuantity, totalPrice, userId, firstBookTitle } =
     req.body;
 
@@ -66,30 +65,34 @@ const getOrders = async (req, res) => {
     password: 'root',
     dateStrings: true,
   });
-
-  const { userId } = req.body;
   const sql = `
     SELECT orders.id, created_at, address, receiver, contact
     , book_title, total_quantity, total_price
     FROM orders LEFT JOIN delivery
     ON orders.delivery_id = delivery.id;
   `;
-
   const [rows, fields] = await conn.query(sql);
   return res.status(StatusCodes.OK).json(rows);
 };
 
-const getOrderDetail = (req, res) => {
-  const sql = ``;
-  const values = [];
-
-  conn.query(sql, values, (err, results) => {
-    if (err) {
-      console.log(err);
-      return res.status(StatusCodes.BAD_REQUEST).end();
-    }
-    return res.status(StatusCodes.OK).json(results);
+const getOrderDetail = async (req, res) => {
+  const conn = await mariadb.createConnection({
+    host: '127.0.0.1',
+    user: 'root',
+    database: 'BookShop',
+    password: 'root',
+    dateStrings: true,
   });
+  const { id } = req.params;
+  const sql = `
+    SELECT book_id, title, author, price, quantity
+    FROM orderedBook LEFT JOIN books
+    ON orderedBook.book_id = books.id
+    WHERE order_id = ?;
+  `;
+
+  const [rows, fields] = await conn.query(sql, [id]);
+  return res.status(StatusCodes.OK).json(rows);
 };
 
 module.exports = { order, getOrders, getOrderDetail };
