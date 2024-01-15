@@ -1,21 +1,9 @@
+const ensureAuthorization = require('../auth');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const conn = require('../mariadb');
 const { StatusCodes } = require('http-status-codes');
 dotenv.config();
-
-// jwt 토큰 권한 체크
-const ensureAuthorization = (req, res) => {
-  try {
-    const receivedJwt = req.headers['authorization'];
-    const decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
-    return decodedJwt;
-  } catch (err) {
-    console.log('# ' + err.name);
-    console.log('# ' + err.message);
-    return err;
-  }
-};
 
 // 장바구니 아이템 추가
 const addToCart = (req, res) => {
