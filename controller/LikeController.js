@@ -1,9 +1,7 @@
 const ensureAuthorization = require('../auth');
-const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const conn = require('../mariadb');
 const { StatusCodes } = require('http-status-codes');
-dotenv.config();
 
 // 좋아요 추가
 const addLike = (req, res) => {

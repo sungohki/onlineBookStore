@@ -3,9 +3,9 @@ const { StatusCodes } = require('http-status-codes');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
-
 dotenv.config();
 
+// 회원 가입
 const join = (req, res) => {
   const { email, password } = req.body;
 
@@ -26,6 +26,7 @@ const join = (req, res) => {
   });
 };
 
+// 회원 로그인
 const login = (req, res) => {
   const { email, password } = req.body;
 
@@ -47,8 +48,8 @@ const login = (req, res) => {
         },
         process.env.PRIVATE_KEY,
         {
-          expiresIn: '1m',
-          // expiresIn: '5m',
+          // expiresIn: '1m',
+          expiresIn: '10m',
           issuer: 'sungohki',
         }
       );
@@ -63,6 +64,7 @@ const login = (req, res) => {
   });
 };
 
+// 비밀 번호 변경 요청
 const passwordResetRequest = (req, res) => {
   const { email } = req.body;
 
@@ -84,6 +86,7 @@ const passwordResetRequest = (req, res) => {
   });
 };
 
+// 비밀 번호 변경
 const passwordReset = (req, res) => {
   const { email, password } = req.body;
 

@@ -6,12 +6,16 @@ dotenv.config();
 const ensureAuthorization = (req, res) => {
   try {
     const receivedJwt = req.headers['authorization'];
-    const decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
-
     console.log('# Received JWT : ', receivedJwt);
-    console.log('# Decodedd JWT : ', decodedJwt);
 
-    return decodedJwt;
+    if (receivedJwt) {
+      const decodedJwt = jwt.verify(receivedJwt, process.env.PRIVATE_KEY);
+      console.log('# Decodedd JWT : ', decodedJwt);
+
+      return decodedJwt;
+    } else {
+      throw new ReferenceError('JWT must be provided');
+    }
   } catch (err) {
     console.log('# ' + err.name);
     console.log(': ' + err.message);
