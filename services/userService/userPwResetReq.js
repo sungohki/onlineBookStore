@@ -1,7 +1,7 @@
 const conn = require('../../mariadb');
 const { StatusCodes } = require('http-status-codes');
 
-const userPwResetRequest = (req, res) => {
+const userPwResetReq = (req, res) => {
   const { email } = req.body;
   const sql = 'SELECT * FROM users  WHERE email = ?';
 
@@ -14,13 +14,11 @@ const userPwResetRequest = (req, res) => {
     const user = results[0];
 
     if (user) {
-      return res.status(StatusCodes.ACCEPTED).json({
+      return res.status(StatusCodes.OK).json({
         email: email,
       });
-    } else {
-      return res.status(StatusCodes.UNAUTHORIZED).end();
-    }
+    } else return res.status(StatusCodes.UNAUTHORIZED).end();
   });
 };
 
-module.exports = userPwResetRequest;
+module.exports = userPwResetReq;

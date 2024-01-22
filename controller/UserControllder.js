@@ -1,11 +1,11 @@
 const userJoin = require('../services/userService/userJoin');
 const userLogin = require('../services/userService/userLogin');
-const userPasswordResetRequest = require('../services/userService/userPwResetRequest');
+const userPasswordResetReq = require('../services/userService/userPwResetReq');
 const userPwReset = require('../services/userService/userPwReset');
 
 const join = userJoin;
 const login = userLogin;
-const passwordResetRequest = userPasswordResetRequest;
+const passwordResetRequest = userPasswordResetReq;
 const passwordReset = userPwReset;
 
 module.exports = {

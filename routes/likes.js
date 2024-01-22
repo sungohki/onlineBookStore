@@ -1,3 +1,5 @@
+const { param } = require('express-validator');
+const { validate } = require('./validator');
 const express = require('express');
 const router = express.Router();
 
